@@ -5,7 +5,6 @@ import {INFLUX_ORG, influxdb} from '../../influx'
 import {systemContract} from '../../common'
 
 export async function sync() {
-    logger.info('Syncing REX data...')
     const rex = influxdb.getWriteApi(INFLUX_ORG, 'rex', 's')
     const state = await systemContract.table('rexpool').get()
     if (state) {
@@ -28,5 +27,6 @@ export async function sync() {
             new Point('namebid_proceeds').intField('namebid_proceeds', state.namebid_proceeds.units)
         )
         rex.writePoint(new Point('loan_num').intField('loan_num', state.loan_num))
+        logger.info('rex data updated')
     }
 }
