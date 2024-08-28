@@ -3,6 +3,7 @@ import {OrgsAPI, BucketsAPI, TasksAPI, Organizations} from '@influxdata/influxdb
 
 import {logger} from '../logger'
 import {setup as setupMarketprices} from './tasks/marketprices'
+import {setup as setupREX} from './tasks/rex'
 
 const INFLUX_URL = Bun.env.UNICOVE_INFLUX_URL
 const INFLUX_TOKEN = Bun.env.UNICOVE_INFLUX_TOKEN
@@ -47,4 +48,5 @@ export async function initialize() {
         process.exit(1)
     }
     await setupMarketprices(org.id)
+    await setupREX(org.id)
 }

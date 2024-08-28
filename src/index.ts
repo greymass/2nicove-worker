@@ -14,12 +14,19 @@ function startMarketprice() {
     scheduler.addSimpleIntervalJob(job)
 }
 
+function startREX() {
+    const task = new AsyncTask(`syncing rex information`, () => syncStaked())
+    const job = new SimpleIntervalJob({seconds: 5, runImmediately: true}, task)
+    scheduler.addSimpleIntervalJob(job)
+}
+
 async function main() {
     logger.info('Initializing database')
     await initialize()
 
     logger.info('Starting task scheduler')
     startMarketprice()
+    startREX()
 
     const port = Bun.env.UNICOVE_HTTP_PORT || 3000
     logger.info('Starting HTTP service', {port})
