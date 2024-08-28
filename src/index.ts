@@ -23,15 +23,15 @@ async function main() {
         async fetch(req) {
             const path = new URL(req.url).pathname
             if (path === '/') return new Response('📊')
-            if (path === '/api/markerprice/cpu') {
+            if (path === '/api/marketprice/cpu') {
                 const data = await getMarkerprice('cpu')
                 return Response.json(data)
             }
-            if (path === '/api/markerprice/net') {
+            if (path === '/api/marketprice/net') {
                 const data = await getMarkerprice('net')
                 return Response.json(data)
             }
-            if (path === '/api/markerprice/ram') {
+            if (path === '/api/marketprice/ram') {
                 const data = await getMarkerprice('ram')
                 return Response.json(data)
             }
