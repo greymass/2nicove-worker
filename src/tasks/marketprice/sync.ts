@@ -11,11 +11,6 @@ const resources = new Resources({
 })
 
 export async function sync() {
-    if (!INFLUX_ORG) {
-        logger.error('InfluxDB organization name not found in environment, exiting')
-        process.exit(1)
-    }
-
     const marketprice = influxdb.getWriteApi(INFLUX_ORG, 'marketprice', 's')
 
     logger.info('Updating resource markets...')

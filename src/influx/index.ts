@@ -6,7 +6,7 @@ import {getTasks} from './tasks/marketprices'
 
 const INFLUX_URL = Bun.env.UNICOVE_INFLUX_URL
 const INFLUX_TOKEN = Bun.env.UNICOVE_INFLUX_TOKEN
-export const INFLUX_ORG = Bun.env.UNICOVE_INFLUX_ORG
+export const INFLUX_ORG = Bun.env.UNICOVE_INFLUX_ORG || 'unicove'
 
 if (!INFLUX_URL || !INFLUX_TOKEN || !INFLUX_ORG) {
     logger.error('InfluxDB connection details not found in environment, exiting')
@@ -19,11 +19,6 @@ export const influxbuckets = new BucketsAPI(influxdb)
 export const influxtasks = new TasksAPI(influxdb)
 
 export async function initialize() {
-    if (!INFLUX_ORG) {
-        logger.error('InfluxDB organization name not found in environment, exiting')
-        process.exit(1)
-    }
-
     logger.info('Initializing InfluxDB connection...')
 
     // Ensure existance of the organization
