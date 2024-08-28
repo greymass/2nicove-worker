@@ -15,7 +15,7 @@ const logformat = printf(({level, message, label, timestamp}) => {
 if (Bun.env.UNICOVE_LOG) {
     transports.push(
         new winston.transports.File({
-            level: 'info',
+            level: Bun.env.UNICOVE_LOG_LEVEL || 'info',
             filename: Bun.env.UNICOVE_LOG,
             format: logformat,
         })
@@ -34,7 +34,7 @@ if (Bun.env.UNICOVE_ERROR_LOG) {
 }
 
 export const logger = winston.createLogger({
-    level: Bun.env.LOG_LEVEL || 'info',
+    level: Bun.env.UNICOVE_LOG_LEVEL || 'info',
     format: combine(timestamp(), prettyPrint()),
     transports,
 })
