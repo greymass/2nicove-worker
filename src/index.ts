@@ -2,19 +2,24 @@ import {ToadScheduler, SimpleIntervalJob, Task, AsyncTask} from 'toad-scheduler'
 
 import {logger} from './logger'
 import {sync as syncMarketprice} from './tasks/marketprice/sync'
+import {sync as syncStaked} from './tasks/rex/sync'
 import {get as getMarkerprice} from './tasks/marketprice/get'
 import {initialize} from './influx'
 
 const scheduler = new ToadScheduler()
+
+function startMarketprice() {
+    const task = new AsyncTask(`syncing resource market`, () => syncMarketprice())
+    const job = new SimpleIntervalJob({seconds: 15, runImmediately: true}, task)
+    scheduler.addSimpleIntervalJob(job)
+}
 
 async function main() {
     logger.info('Initializing database')
     await initialize()
 
     logger.info('Starting task scheduler')
-    const task = new AsyncTask(`syncing resource market`, () => syncMarketprice())
-    const job = new SimpleIntervalJob({seconds: 15, runImmediately: true}, task)
-    scheduler.addSimpleIntervalJob(job)
+    startMarketprice()
 
     const port = Bun.env.UNICOVE_HTTP_PORT || 3000
     logger.info('Starting HTTP service', {port})
