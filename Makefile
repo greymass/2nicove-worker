@@ -3,7 +3,7 @@ include .env
 SHELL := /usr/bin/env bash
 BIN := ./node_modules/.bin
 
-build:
+build: node_modules
 	bun run build
 
 .PHONY: dev
