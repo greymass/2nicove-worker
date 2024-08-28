@@ -1,5 +1,6 @@
 .env
 node_modules/
+src/contracts/*.ts
 dist/
 error.log
 unicove.log
