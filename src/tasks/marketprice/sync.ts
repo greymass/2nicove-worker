@@ -24,7 +24,7 @@ async function syncTokenMarkets() {
     for (const pair of pairs) {
         const datapoint = await delphiContract.table('datapoints', pair).get()
         if (datapoint) {
-            logger.info(`${pair} price: ${datapoint.median} from ${datapoint.timestamp}`)
+            logger.debug(`${pair} price: ${datapoint.median} from ${datapoint.timestamp}`)
             marketprice.writePoint(new Point(pair).intField('value', datapoint.median))
         }
     }
