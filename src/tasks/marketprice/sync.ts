@@ -4,15 +4,32 @@ import {Point} from '@influxdata/influxdb-client'
 
 import {logger} from '../../logger'
 import {INFLUX_ORG, influxdb} from '../../influx'
+import {delphiContract} from '../../common'
 
 const resources = new Resources({
     url: Bun.env.UNICOVE_API,
     sampleAccount: 'eosio.reserv',
 })
 
-export async function sync() {
-    const marketprice = influxdb.getWriteApi(INFLUX_ORG, 'marketprice', 's')
+const marketprice = influxdb.getWriteApi(INFLUX_ORG, 'marketprice', 's')
 
+export async function sync() {
+    syncResourceMarkets()
+    syncTokenMarkets()
+}
+
+async function syncTokenMarkets() {
+    const pairs = ['eosusd', 'btccny', 'btcusd', 'eosbtc']
+    for (const pair of pairs) {
+        const datapoint = await delphiContract.table('datapoints', pair).get()
+        if (datapoint) {
+            logger.info(`${pair} price: ${datapoint.median} from ${datapoint.timestamp}`)
+            marketprice.writePoint(new Point(pair).intField('value', datapoint.median))
+        }
+    }
+}
+
+async function syncResourceMarkets() {
     const sample = await resources.getSampledUsage()
 
     const ramstate = await resources.v1.ram.get_state()
