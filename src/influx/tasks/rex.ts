@@ -30,7 +30,7 @@ async function setupDownsampleBuckets(orgID: string) {
         const retentionRules = [{everySeconds: retention}]
         try {
             await influxbuckets.getBuckets({orgID, name})
-            logger.info(`Bucket "${name}" found`)
+            logger.debug(`Bucket "${name}" found`)
         } catch (error) {
             logger.info(`Bucket "${name}" not found, creating.`)
             influxbuckets.postBuckets({body: {orgID, name, retentionRules}})
@@ -42,7 +42,7 @@ async function setupTasks(orgID: string) {
     // Setup processing tasks
     const tasksFound = await influxtasks.getTasks({orgID, name: 'rex-1m'})
     if (tasksFound && tasksFound.tasks && tasksFound.tasks.length) {
-        logger.info(`Tasks found`)
+        logger.debug(`Tasks found`)
     } else {
         logger.info(`Tasks not found, creating`)
         for (const task of getTasks()) {
@@ -64,7 +64,7 @@ export async function setupIngress(orgID: string) {
         const retentionRules = [{everySeconds: 86400}] // 1-day retention
         try {
             await influxbuckets.getBuckets({orgID, name})
-            logger.info(`Bucket "${name}" found`)
+            logger.debug(`Bucket "${name}" found`)
         } catch (error) {
             logger.info(`Bucket "${name}" not found, creating.`)
             influxbuckets.postBuckets({body: {orgID, name, retentionRules}})

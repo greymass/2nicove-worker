@@ -16,6 +16,7 @@ const marketprice = influxdb.getWriteApi(INFLUX_ORG, 'marketprice', 's')
 export async function sync() {
     syncResourceMarkets()
     syncTokenMarkets()
+    logger.info('markerprice data updated')
 }
 
 async function syncTokenMarkets() {
@@ -52,6 +53,4 @@ async function syncResourceMarkets() {
     logger.debug(`Current NET price: ${net}`)
 
     marketprice.writePoint(new Point('net').floatField('value', net.units))
-
-    logger.info('markerprice data updated')
 }
