@@ -34,18 +34,24 @@ async function main() {
         port,
         async fetch(req) {
             const path = new URL(req.url).pathname
-            if (path === '/') return new Response('📊')
+            let res: Response | undefined
+            if (path === '/') res = new Response('📊')
             if (path === '/api/marketprice/cpu') {
                 const data = await getMarkerprice('cpu')
-                return Response.json(data)
+                res = Response.json(data)
             }
             if (path === '/api/marketprice/net') {
                 const data = await getMarkerprice('net')
-                return Response.json(data)
+                res = Response.json(data)
             }
             if (path === '/api/marketprice/ram') {
                 const data = await getMarkerprice('ram')
-                return Response.json(data)
+                res = Response.json(data)
+            }
+            if (res) {
+                res.headers.set('Access-Control-Allow-Origin', '*')
+                res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                return res
             }
             return new Response('Page not found', {status: 404})
         },
