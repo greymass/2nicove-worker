@@ -9,13 +9,21 @@ import {initialize} from './influx'
 const scheduler = new ToadScheduler()
 
 function startMarketprice() {
-    const task = new AsyncTask(`syncing resource market`, () => syncMarketprice())
+    const task = new Task(
+        `syncing resource market`,
+        () => syncMarketprice(),
+        (e) => logger.error(e)
+    )
     const job = new SimpleIntervalJob({seconds: 15, runImmediately: true}, task)
     scheduler.addSimpleIntervalJob(job)
 }
 
 function startREX() {
-    const task = new AsyncTask(`syncing rex information`, () => syncStaked())
+    const task = new Task(
+        `syncing rex information`,
+        () => syncStaked(),
+        (e) => logger.error(e)
+    )
     const job = new SimpleIntervalJob({seconds: 5, runImmediately: true}, task)
     scheduler.addSimpleIntervalJob(job)
 }

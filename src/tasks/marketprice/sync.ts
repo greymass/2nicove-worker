@@ -13,7 +13,7 @@ const resources = new Resources({
 
 const marketprice = influxdb.getWriteApi(INFLUX_ORG, 'marketprice', 's')
 
-export async function sync() {
+export function sync() {
     syncResourceMarkets()
     syncTokenMarkets()
     logger.info('markerprice data updated')
@@ -30,27 +30,35 @@ async function syncTokenMarkets() {
     }
 }
 
-async function syncResourceMarkets() {
-    const sample = await resources.getSampledUsage()
+function syncResourceMarkets() {
+    resources.v1.ram.get_state().then((ramstate) => {
+        logger.debug('RAM state', Serializer.objectify(ramstate))
 
-    const ramstate = await resources.v1.ram.get_state()
-    logger.debug('RAM state', Serializer.objectify(ramstate))
+        const ram = ramstate.price_per_kb(1)
+        logger.debug(`Current RAM price: ${ram}`)
 
-    const ram = ramstate.price_per_kb(1)
-    logger.debug(`Current RAM price: ${ram}`)
+        marketprice.writePoint(new Point('ram').intField('value', ram.units))
+    })
 
-    marketprice.writePoint(new Point('ram').intField('value', ram.units))
+    resources.getSampledUsage().then((sample) =>
+        resources.v1.powerup.get_state().then((powerupstate) => {
+            logger.debug('PowerUp state', Serializer.objectify(powerupstate))
 
-    const powerupstate = await resources.v1.powerup.get_state()
-    logger.debug('PowerUp state', Serializer.objectify(powerupstate))
+            const cpu = Asset.from(
+                powerupstate.cpu.price_per_ms(sample, 1),
+                powerupstate.min_powerup_fee.symbol
+            )
+            logger.debug(`Current CPU price: ${cpu}`)
 
-    const cpu = Asset.from(powerupstate.cpu.price_per_ms(sample, 1), ram.symbol)
-    logger.debug(`Current CPU price: ${cpu}`)
+            marketprice.writePoint(new Point('cpu').floatField('value', cpu.units))
 
-    marketprice.writePoint(new Point('cpu').floatField('value', cpu.units))
+            const net = Asset.from(
+                powerupstate.net.price_per_kb(sample, 1),
+                powerupstate.min_powerup_fee.symbol
+            )
+            logger.debug(`Current NET price: ${net}`)
 
-    const net = Asset.from(powerupstate.net.price_per_kb(sample, 1), ram.symbol)
-    logger.debug(`Current NET price: ${net}`)
-
-    marketprice.writePoint(new Point('net').floatField('value', net.units))
+            marketprice.writePoint(new Point('net').floatField('value', net.units))
+        })
+    )
 }
