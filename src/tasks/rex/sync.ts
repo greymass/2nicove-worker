@@ -45,4 +45,7 @@ export function sync() {
                 logger.info('rex data updated')
             }
         })
+        .catch((e) => {
+            logger.error('error syncing rex', e)
+        })
 }
