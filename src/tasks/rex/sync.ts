@@ -3,6 +3,7 @@ import {Point} from '@influxdata/influxdb-client'
 import {logger} from '../../logger'
 import {INFLUX_ORG, influxdb} from '../../influx'
 import {client, systemContract} from '../../common'
+import {Asset} from '@wharfkit/antelope'
 
 export function sync() {
     const rex = influxdb.getWriteApi(INFLUX_ORG, 'rex', 'ms')
@@ -11,10 +12,16 @@ export function sync() {
         .get_info()
         .then((info) => {
             const timestamp = info.head_block_time.toDate()
-            systemContract
-                .table('rexpool')
-                .get()
-                .then((state) => {
+            client.v1.chain
+                .get_table_rows({
+                    json: true,
+                    code: 'eosio',
+                    scope: 'eosio',
+                    table: 'rexpool',
+                    limit: 1,
+                })
+                .then((rows) => {
+                    const [state] = rows.rows
                     if (state) {
                         logger.debug(`total_lent: ${state.total_lent}`)
                         logger.debug(`total_unlent: ${state.total_unlent}`)
@@ -26,32 +33,35 @@ export function sync() {
 
                         rex.writePoint(
                             new Point('total_lent')
-                                .intField('total_lent', state.total_lent.units)
+                                .intField('total_lent', Asset.from(state.total_lent).units)
                                 .timestamp(timestamp)
                         )
                         rex.writePoint(
                             new Point('total_unlent')
-                                .intField('total_unlent', state.total_unlent.units)
+                                .intField('total_unlent', Asset.from(state.total_unlent).units)
                                 .timestamp(timestamp)
                         )
                         rex.writePoint(
                             new Point('total_rent')
-                                .intField('total_rent', state.total_rent.units)
+                                .intField('total_rent', Asset.from(state.total_rent).units)
                                 .timestamp(timestamp)
                         )
                         rex.writePoint(
                             new Point('total_lendable')
-                                .intField('total_lendable', state.total_lendable.units)
+                                .intField('total_lendable', Asset.from(state.total_lendable).units)
                                 .timestamp(timestamp)
                         )
                         rex.writePoint(
                             new Point('total_rex')
-                                .intField('total_rex', state.total_rex.units)
+                                .intField('total_rex', Asset.from(state.total_rex).units)
                                 .timestamp(timestamp)
                         )
                         rex.writePoint(
                             new Point('namebid_proceeds')
-                                .intField('namebid_proceeds', state.namebid_proceeds.units)
+                                .intField(
+                                    'namebid_proceeds',
+                                    Asset.from(state.namebid_proceeds).units
+                                )
                                 .timestamp(timestamp)
                         )
                         rex.writePoint(
