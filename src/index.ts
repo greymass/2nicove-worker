@@ -21,7 +21,8 @@ function startDbSize() {
     )
     const job = new SimpleIntervalJob(
         {seconds: Number(TASK_INTERVAL_DBSIZE), runImmediately: true},
-        task
+        task,
+        {preventOverrun: true}
     )
     scheduler.addSimpleIntervalJob(job)
 }
@@ -34,7 +35,8 @@ function startMarketprice() {
     )
     const job = new SimpleIntervalJob(
         {seconds: Number(TASK_INTERVAL_MARKETPRICE), runImmediately: true},
-        task
+        task,
+        {preventOverrun: true}
     )
     scheduler.addSimpleIntervalJob(job)
 }
@@ -47,7 +49,8 @@ function startREX() {
     )
     const job = new SimpleIntervalJob(
         {seconds: Number(TASK_INTERVAL_REX), runImmediately: true},
-        task
+        task,
+        {preventOverrun: true}
     )
     scheduler.addSimpleIntervalJob(job)
 }
