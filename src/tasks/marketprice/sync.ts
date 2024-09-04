@@ -16,7 +16,6 @@ const marketprice = influxdb.getWriteApi(INFLUX_ORG, 'marketprice', 'ms')
 export function sync() {
     syncResourceMarkets()
     syncTokenMarkets()
-    logger.info('markerprice data updated')
 }
 
 async function syncTokenMarkets() {
@@ -35,6 +34,7 @@ async function syncTokenMarkets() {
                     .intField('value', datapoint.median)
                     .timestamp(datapoint.timestamp.toDate())
             )
+            logger.info('tokenmarket data updated', {ts: datapoint.timestamp.toDate()})
         }
     }
 }
@@ -96,6 +96,8 @@ function syncResourceMarkets() {
                 .catch((e) => {
                     logger.error('error syncing sample usage:', e)
                 })
+
+            logger.info('resource market data updated', {ts: timestamp})
         })
         .catch((e) => {
             logger.error('get_info error in marketprice:', e)

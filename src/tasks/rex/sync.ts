@@ -69,7 +69,7 @@ export function sync() {
                                 .intField('loan_num', state.loan_num)
                                 .timestamp(timestamp)
                         )
-                        logger.info('rex data updated')
+                        logger.info('rex data updated', {ts: timestamp})
                     }
                 })
                 .catch((e) => {

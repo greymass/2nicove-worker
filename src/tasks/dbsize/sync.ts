@@ -39,7 +39,7 @@ export function sync() {
                                 .timestamp(timestamp)
                         )
                     }
-                    logger.info('dbsize data updated')
+                    logger.info('dbsize data updated', {ts: timestamp})
                 })
                 .catch((e) => {
                     logger.error('error syncing dbsize', e)
