@@ -9,13 +9,20 @@ import {initialize} from './influx'
 
 const scheduler = new ToadScheduler()
 
+const TASK_INTERVAL_DBSIZE = Bun.env.UNICOVE_TASK_INTERVAL_DBSIZE || 30 // Default 30s interval for dbsize task
+const TASK_INTERVAL_MARKETPRICE = Bun.env.UNICOVE_TASK_INTERVAL_MARKETPRICE || 30 // Default 30s interval for marketprice task
+const TASK_INTERVAL_REX = Bun.env.UNICOVE_TASK_INTERVAL_REX || 30 // Default 30s interval for rex task
+
 function startDbSize() {
     const task = new Task(
         `syncing dbsize`,
         () => syncDbSize(),
         (e) => logger.error(e)
     )
-    const job = new SimpleIntervalJob({seconds: 15, runImmediately: true}, task)
+    const job = new SimpleIntervalJob(
+        {seconds: Number(TASK_INTERVAL_DBSIZE), runImmediately: true},
+        task
+    )
     scheduler.addSimpleIntervalJob(job)
 }
 
@@ -25,7 +32,10 @@ function startMarketprice() {
         () => syncMarketprice(),
         (e) => logger.error(e)
     )
-    const job = new SimpleIntervalJob({seconds: 15, runImmediately: true}, task)
+    const job = new SimpleIntervalJob(
+        {seconds: Number(TASK_INTERVAL_MARKETPRICE), runImmediately: true},
+        task
+    )
     scheduler.addSimpleIntervalJob(job)
 }
 
@@ -35,7 +45,10 @@ function startREX() {
         () => syncStaked(),
         (e) => logger.error(e)
     )
-    const job = new SimpleIntervalJob({seconds: 5, runImmediately: true}, task)
+    const job = new SimpleIntervalJob(
+        {seconds: Number(TASK_INTERVAL_REX), runImmediately: true},
+        task
+    )
     scheduler.addSimpleIntervalJob(job)
 }
 
