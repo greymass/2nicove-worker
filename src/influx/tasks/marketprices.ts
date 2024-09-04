@@ -1,4 +1,10 @@
-import {INFLUX_ORG, influxbuckets, influxtasks} from '..'
+import {
+    INFLUX_INGRESS_RETENTION,
+    INFLUX_ORG,
+    INFLUX_PRECISE_RETENTION,
+    influxbuckets,
+    influxtasks,
+} from '..'
 import {logger} from '../../logger'
 
 export async function setup(orgID: string) {
@@ -18,7 +24,7 @@ async function setupDownsampleBuckets(orgID: string) {
         switch (name) {
             case 'marketprice-1m':
             case 'marketprice-15m': {
-                retention = 86400 * 90 // 90 day retention
+                retention = Number(INFLUX_PRECISE_RETENTION)
                 break
             }
             default: {
@@ -60,7 +66,7 @@ export async function setupIngress(orgID: string) {
     // Ensure existance of the ingress buckets
     const buckets = ['marketprice']
     for (const name of buckets) {
-        const retentionRules = [{everySeconds: 86400}] // 1-day retention
+        const retentionRules = [{everySeconds: Number(INFLUX_INGRESS_RETENTION)}]
         try {
             await influxbuckets.getBuckets({orgID, name})
             logger.debug(`Bucket "${name}" found`)

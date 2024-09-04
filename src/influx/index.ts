@@ -8,6 +8,8 @@ import {setup as setupREX} from './tasks/rex'
 
 const INFLUX_URL = Bun.env.UNICOVE_INFLUX_URL
 const INFLUX_TOKEN = Bun.env.UNICOVE_INFLUX_TOKEN
+export const INFLUX_PRECISE_RETENTION = Bun.env.UNICOVE_INFLUX_PRECISE_RETENTION || 86400 * 90 // Default 90 day retention for 1m and 15m data
+export const INFLUX_INGRESS_RETENTION = Bun.env.UNICOVE_INFLUX_INGRESS_RETENTION || 86400 // Default 1 day retention for ingress data
 export const INFLUX_ORG = Bun.env.UNICOVE_INFLUX_ORG || 'unicove'
 
 if (!INFLUX_URL || !INFLUX_TOKEN || !INFLUX_ORG) {
