@@ -1,12 +1,23 @@
 import {ToadScheduler, SimpleIntervalJob, Task, AsyncTask} from 'toad-scheduler'
 
 import {logger} from './logger'
+import {sync as syncDbSize} from './tasks/dbsize/sync'
 import {sync as syncMarketprice} from './tasks/marketprice/sync'
 import {sync as syncStaked} from './tasks/rex/sync'
 import {get as getMarkerprice} from './tasks/marketprice/get'
 import {initialize} from './influx'
 
 const scheduler = new ToadScheduler()
+
+function startDbSize() {
+    const task = new Task(
+        `syncing dbsize`,
+        () => syncDbSize(),
+        (e) => logger.error(e)
+    )
+    const job = new SimpleIntervalJob({seconds: 15, runImmediately: true}, task)
+    scheduler.addSimpleIntervalJob(job)
+}
 
 function startMarketprice() {
     const task = new Task(
@@ -33,6 +44,7 @@ async function main() {
     await initialize()
 
     logger.info('Starting task scheduler')
+    startDbSize()
     startMarketprice()
     startREX()
 
