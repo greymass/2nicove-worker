@@ -4,14 +4,14 @@ import {Point} from '@influxdata/influxdb-client'
 
 import {logger} from '../../logger'
 import {INFLUX_ORG, influxdb} from '../../influx'
-import {delphiContract} from '../../common'
+import {client, delphiContract} from '../../common'
 
 const resources = new Resources({
     url: Bun.env.UNICOVE_API,
     sampleAccount: 'eosio.reserv',
 })
 
-const marketprice = influxdb.getWriteApi(INFLUX_ORG, 'marketprice', 's')
+const marketprice = influxdb.getWriteApi(INFLUX_ORG, 'marketprice', 'ms')
 
 export function sync() {
     syncResourceMarkets()
@@ -30,55 +30,74 @@ async function syncTokenMarkets() {
             })
         if (datapoint) {
             logger.debug(`${pair} price: ${datapoint.median} from ${datapoint.timestamp}`)
-            marketprice.writePoint(new Point(pair).intField('value', datapoint.median))
+            marketprice.writePoint(
+                new Point(pair)
+                    .intField('value', datapoint.median)
+                    .timestamp(datapoint.timestamp.toDate())
+            )
         }
     }
 }
 
 function syncResourceMarkets() {
-    resources.v1.ram
-        .get_state()
-        .then((ramstate) => {
-            logger.debug('RAM state', Serializer.objectify(ramstate))
+    client.v1.chain
+        .get_info()
+        .then((info) => {
+            const timestamp = info.head_block_time.toDate()
 
-            const ram = ramstate.price_per_kb(1)
-            logger.debug(`Current RAM price: ${ram}`)
-
-            marketprice.writePoint(new Point('ram').intField('value', ram.units))
-        })
-        .catch((e) => {
-            logger.error('error syncing ram:', e)
-        })
-
-    resources
-        .getSampledUsage()
-        .then((sample) =>
-            resources.v1.powerup
+            resources.v1.ram
                 .get_state()
-                .then((powerupstate) => {
-                    logger.debug('PowerUp state', Serializer.objectify(powerupstate))
+                .then((ramstate) => {
+                    logger.debug('RAM state', Serializer.objectify(ramstate))
 
-                    const cpu = Asset.from(
-                        powerupstate.cpu.price_per_ms(sample, 1),
-                        powerupstate.min_powerup_fee.symbol
+                    const ram = ramstate.price_per_kb(1)
+                    logger.debug(`Current RAM price: ${ram}`)
+
+                    marketprice.writePoint(
+                        new Point('ram').intField('value', ram.units).timestamp(timestamp)
                     )
-                    logger.debug(`Current CPU price: ${cpu}`)
-
-                    marketprice.writePoint(new Point('cpu').floatField('value', cpu.units))
-
-                    const net = Asset.from(
-                        powerupstate.net.price_per_kb(sample, 1),
-                        powerupstate.min_powerup_fee.symbol
-                    )
-                    logger.debug(`Current NET price: ${net}`)
-
-                    marketprice.writePoint(new Point('net').floatField('value', net.units))
                 })
                 .catch((e) => {
-                    logger.error('error syncing powerup state:', e)
+                    logger.error('error syncing ram:', e)
                 })
-        )
+
+            resources
+                .getSampledUsage()
+                .then((sample) =>
+                    resources.v1.powerup
+                        .get_state()
+                        .then((powerupstate) => {
+                            logger.debug('PowerUp state', Serializer.objectify(powerupstate))
+
+                            const cpu = Asset.from(
+                                powerupstate.cpu.price_per_ms(sample, 1),
+                                powerupstate.min_powerup_fee.symbol
+                            )
+                            logger.debug(`Current CPU price: ${cpu}`)
+
+                            marketprice.writePoint(
+                                new Point('cpu').floatField('value', cpu.units).timestamp(timestamp)
+                            )
+
+                            const net = Asset.from(
+                                powerupstate.net.price_per_kb(sample, 1),
+                                powerupstate.min_powerup_fee.symbol
+                            )
+                            logger.debug(`Current NET price: ${net}`)
+
+                            marketprice.writePoint(
+                                new Point('net').floatField('value', net.units).timestamp(timestamp)
+                            )
+                        })
+                        .catch((e) => {
+                            logger.error('error syncing powerup state:', e)
+                        })
+                )
+                .catch((e) => {
+                    logger.error('error syncing sample usage:', e)
+                })
+        })
         .catch((e) => {
-            logger.error('error syncing sample usage:', e)
+            logger.error('get_info error in marketprice:', e)
         })
 }
