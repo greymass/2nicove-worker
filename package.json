@@ -10,10 +10,8 @@
         "bun-types": "latest",
         "eslint": "^9.9.1",
         "eslint-config-prettier": "^9.1.0",
-        "grpc-tools": "^1.12.4",
         "prettier": "^3.3.3",
         "prettier-plugin-organize-imports": "^4.0.0",
-        "ts-proto": "^2.2.0",
         "tslib": "^2.7.0",
         "typescript": "^5.5.4",
         "typescript-eslint": "^8.3.0",
@@ -25,7 +23,9 @@
         "@wharfkit/antelope": "^1.0.12",
         "@wharfkit/contract": "^1.1.5",
         "@wharfkit/resources": "^1.2.3",
-        "nice-grpc": "^2.1.9",
-        "toad-scheduler": "^3.0.1"
+        "grpc-tools": "^1.12.4",
+        "protoc-gen-js": "^3.21.2",
+        "toad-scheduler": "^3.0.1",
+        "ts-protoc-gen": "^0.15.0"
     }
 }

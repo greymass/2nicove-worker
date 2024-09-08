@@ -18,12 +18,12 @@ message SingleBlockRequest {
 
   // Get the current known canonical version of a block at with this number
   message BlockNumber{
-    uint64 num=1;
+    uint64 num=1 [jstype = JS_STRING];
   }
 
   // Get the current block with specific hash and number
   message BlockHashAndNumber{
-    uint64 num=1;
+    uint64 num=1 [jstype = JS_STRING];
     string hash=2;
   }
 
@@ -76,7 +76,7 @@ message Request {
   //
   // The stream will close **after** that block has passed so the boundary is
   // **inclusive**.
-  uint64 stop_block_num = 3;
+  uint64 stop_block_num = 3 [jstype = JS_STRING];
 
   // With final_block_only, you only receive blocks with STEP_FINAL
   // Default behavior will send blocks as STEP_NEW, with occasional STEP_UNDO

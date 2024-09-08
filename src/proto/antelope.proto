@@ -232,13 +232,13 @@ message FinalityData {
 
 message FinalizerPolicy {
   uint32 generation = 1;
-  uint64 threshold = 2;
+  uint64 threshold = 2 [jstype = JS_STRING];
   repeated FinalizerAuthority finalizers = 3;
 }
 
 message FinalizerAuthority {
   string description = 1;
-  uint64 weight = 2;
+  uint64 weight = 2 [jstype = JS_STRING];
   string public_key = 3;
 }
 
@@ -350,7 +350,7 @@ message ProducerToLastImpliedIRB {
 
 message TransactionReceipt {
   string id = 4;
-  uint64 index = 6; // within the SignedBlock
+  uint64 index = 6 [jstype = JS_STRING]; // within the SignedBlock
 
   TransactionStatus status = 1;
   uint32 cpu_usage_micro_seconds = 2;
@@ -528,10 +528,10 @@ message TransactionTrace {
   string id = 1;
 
   // Reference to the block number in which this transaction was executed.
-  uint64 block_num = 2;
+  uint64 block_num = 2 [jstype = JS_STRING];
 
   // Index within block's unfiltered execution traces
-  uint64 index = 26;
+  uint64 index = 26 [jstype = JS_STRING];
 
   // Reference to the block time this transaction was executed in
   google.protobuf.Timestamp block_time = 3;
@@ -544,7 +544,7 @@ message TransactionTrace {
 
   int64 elapsed = 6;
 
-  uint64 net_usage = 7;
+  uint64 net_usage = 7 [jstype = JS_STRING];
 
   // Whether this transaction was taken from a scheduled transactions pool for
   // execution (delayed)
@@ -560,7 +560,7 @@ message TransactionTrace {
   // Exception leading to the failed dtrx trace.
   Exception exception = 15;
 
-  uint64 error_code = 16;
+  uint64 error_code = 16 [jstype = JS_STRING];
 
   // List of database operations this transaction entailed
   repeated DBOp db_ops = 17;
@@ -620,7 +620,7 @@ message ActionTrace {
   int64 elapsed = 4;
   string console = 5;
   string transaction_id = 6;
-  uint64 block_num = 7;
+  uint64 block_num = 7 [jstype = JS_STRING];
   string producer_block_id = 8;
   google.protobuf.Timestamp block_time = 9;
   repeated AccountRAMDelta account_ram_deltas = 10;
@@ -638,7 +638,7 @@ message ActionTrace {
   string json_return_value = 42;
 
   Exception exception = 15;
-  uint64 error_code = 20; // https://github.com/EOSIO/eos/pull/7108
+  uint64 error_code = 20 [jstype = JS_STRING]; // https://github.com/EOSIO/eos/pull/7108
   uint32 action_ordinal = 16;
   uint32 creator_action_ordinal = 17;
   uint32 closest_unnotified_ancestor_action_ordinal = 18;
@@ -658,16 +658,16 @@ message ActionTrace {
 message ActionReceipt {
   string receiver = 1;
   string digest = 2;
-  uint64 global_sequence = 3;
+  uint64 global_sequence = 3 [jstype = JS_STRING];
   repeated AuthSequence auth_sequence = 4;
-  uint64 recv_sequence = 5;
-  uint64 code_sequence = 6;
-  uint64 abi_sequence = 7;
+  uint64 recv_sequence = 5 [jstype = JS_STRING];
+  uint64 code_sequence = 6 [jstype = JS_STRING];
+  uint64 abi_sequence = 7 [jstype = JS_STRING];
 }
 
 message AuthSequence {
   string account_name = 1;
-  uint64 sequence = 2;
+  uint64 sequence = 2 [jstype = JS_STRING];
 }
 
 message AccountRAMDelta {
@@ -730,7 +730,7 @@ message RAMOp {
   uint32 action_index = 2;
   string payer = 3;
   int64 delta = 4;
-  uint64 usage = 5;
+  uint64 usage = 5 [jstype = JS_STRING];
 
   // Namespace representing the category the RAM operation belong to, like
   // account, table_row, table, etc.
@@ -857,7 +857,7 @@ message DTrxOp {
 
 message ExtDTrxOp {
   string source_transaction_id = 1;
-  uint64 block_num = 2;
+  uint64 block_num = 2 [jstype = JS_STRING];
   string block_id = 3;
   google.protobuf.Timestamp block_time = 4;
 
@@ -898,10 +898,10 @@ message PermOp {
 
 message PermissionObject {
   // Id represents the EOSIO internal id of this permission object.
-  uint64 id = 10;
+  uint64 id = 10 [jstype = JS_STRING];
 
   // ParentId represents the EOSIO internal id of the parent's of this permission object.
-  uint64 parent_id = 11;
+  uint64 parent_id = 11 [jstype = JS_STRING];
 
   // Owner is the account for which this permission was set
   string owner = 1;
@@ -965,13 +965,13 @@ message RlimitOp {
 message RlimitState {
   UsageAccumulator average_block_net_usage = 1;
   UsageAccumulator average_block_cpu_usage = 2;
-  uint64 pending_net_usage = 3;
-  uint64 pending_cpu_usage = 4;
-  uint64 total_net_weight = 5;
-  uint64 total_cpu_weight = 6;
-  uint64 total_ram_bytes = 7;
-  uint64 virtual_net_limit = 8;
-  uint64 virtual_cpu_limit = 9;
+  uint64 pending_net_usage = 3 [jstype = JS_STRING];
+  uint64 pending_cpu_usage = 4 [jstype = JS_STRING];
+  uint64 total_net_weight = 5 [jstype = JS_STRING];
+  uint64 total_cpu_weight = 6 [jstype = JS_STRING];
+  uint64 total_ram_bytes = 7 [jstype = JS_STRING];
+  uint64 virtual_net_limit = 8 [jstype = JS_STRING];
+  uint64 virtual_cpu_limit = 9 [jstype = JS_STRING];
 }
 
 message RlimitConfig {
@@ -993,18 +993,18 @@ message RlimitAccountUsage {
   string owner = 1;
   UsageAccumulator net_usage = 2;
   UsageAccumulator cpu_usage = 3;
-  uint64 ram_usage = 4;
+  uint64 ram_usage = 4 [jstype = JS_STRING];
 }
 
 message UsageAccumulator {
   uint32 last_ordinal = 1;
-  uint64 value_ex = 2;
-  uint64 consumed = 3;
+  uint64 value_ex = 2 [jstype = JS_STRING];
+  uint64 consumed = 3 [jstype = JS_STRING];
 }
 
 message ElasticLimitParameters {
-  uint64 target = 1;
-  uint64 max = 2;
+  uint64 target = 1 [jstype = JS_STRING];
+  uint64 max = 2 [jstype = JS_STRING];
   uint32 periods = 3;
   uint32 max_multiplier = 4;
   Ratio contract_rate = 5;
@@ -1012,8 +1012,8 @@ message ElasticLimitParameters {
 }
 
 message Ratio {
-  uint64 numerator = 1;
-  uint64 denominator = 2;
+  uint64 numerator = 1 [jstype = JS_STRING];
+  uint64 denominator = 2 [jstype = JS_STRING];
 }
 
 message Exception {
@@ -1073,7 +1073,7 @@ message AccountCreationRef {
   // Account that created the `account`
   string creator = 2;
   // At which block number this happened
-  uint64 block_num = 3;
+  uint64 block_num = 3 [jstype = JS_STRING];
   // At which block ID this happened
   string block_id = 4;
   google.protobuf.Timestamp block_time = 5;
@@ -1112,5 +1112,5 @@ message TransactionTraceWithBlockRef {
 
 message BlockRef {
   bytes hash = 1;
-  uint64 number = 2;
+  uint64 number = 2 [jstype = JS_STRING];
 }
