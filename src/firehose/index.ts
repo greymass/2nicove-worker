@@ -7,6 +7,8 @@ import {Response, StreamClient, StreamDefinition} from '../compiled_proto/fireho
 
 let lastCompletedBlock = 1
 
+const cpu = influxdb.getWriteApi(INFLUX_ORG, 'cpu', 'ms')
+
 class Counter extends Map {
     constructor() {
         super()
@@ -21,12 +23,10 @@ class Counter extends Map {
 }
 
 function process(response: Response) {
-    const cpu = influxdb.getWriteApi(INFLUX_ORG, 'cpu', 'ms')
     if (!response.block) {
         throw new Error('no block')
     }
     const block = Block.decode(response.block.value)
-    // console.log(block)
     if (block) {
         if (!block.header || !block.header.timestamp) {
             throw new Error('no header')
