@@ -5,16 +5,6 @@ import {influxdb, INFLUX_ORG} from '../influx'
 import {Block} from '../compiled_proto/antelope'
 import {Response, StreamClient, StreamDefinition} from '../compiled_proto/firehose'
 
-if (!Bun.env.UNICOVE_FIREHOSE_URL) {
-    throw new Error('UNICOVE_FIREHOSE_URL not set')
-}
-
-const channel = createChannel(Bun.env.UNICOVE_FIREHOSE_URL, ChannelCredentials.createInsecure(), {
-    'grpc.max_receive_message_length': -1,
-})
-
-const client: StreamClient = createClient(StreamDefinition, channel)
-
 let lastCompletedBlock = 1
 
 class Counter extends Map {
@@ -198,10 +188,21 @@ function process(response: Response) {
 }
 
 export async function doWork() {
+    if (!Bun.env.UNICOVE_FIREHOSE_URL) {
+        throw new Error('UNICOVE_FIREHOSE_URL not set')
+    }
+    const channel = createChannel(
+        Bun.env.UNICOVE_FIREHOSE_URL,
+        ChannelCredentials.createInsecure(),
+        {
+            'grpc.max_receive_message_length': -1,
+        }
+    )
+    const client: StreamClient = createClient(StreamDefinition, channel)
     try {
         const options = {
             startBlockNum: lastCompletedBlock + 1,
-            finalBlocksOnly: true,
+            // finalBlocksOnly: true,
         }
         console.log('doWork', options)
         for await (const response of client.blocks(options)) {
@@ -209,6 +210,7 @@ export async function doWork() {
         }
     } catch (e: unknown) {
         console.log('error', e)
+        channel.close()
         await doWork()
     }
 }
