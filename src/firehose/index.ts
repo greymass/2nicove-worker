@@ -199,7 +199,8 @@ export async function doWork() {
     }
     const client = new firehose.firehose.v2.StreamClient(
         Bun.env.UNICOVE_FIREHOSE_URL,
-        ChannelCredentials.createSsl(),
+        // ChannelCredentials.createSsl(),
+        ChannelCredentials.createInsecure(),
         {
             'grpc.max_receive_message_length': -1,
         }
@@ -224,7 +225,7 @@ export async function doWork() {
         }
     } catch (e: unknown) {
         console.log('error', e)
-        // channel.close()
+        client.close()
         await doWork()
     }
 }
