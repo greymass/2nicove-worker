@@ -2,6 +2,7 @@ import {InfluxDB} from '@influxdata/influxdb-client'
 import {OrgsAPI, BucketsAPI, TasksAPI, Organizations} from '@influxdata/influxdb-client-apis'
 
 import {logger} from '../logger'
+import {setup as setupContracts} from './tasks/cpu'
 import {setup as setupDbSize} from './tasks/dbsize'
 import {setup as setupMarketprices} from './tasks/marketprices'
 import {setup as setupREX} from './tasks/rex'
@@ -53,4 +54,5 @@ export async function initialize() {
     await setupMarketprices(org.id)
     await setupREX(org.id)
     await setupDbSize(org.id)
+    await setupContracts(org.id)
 }

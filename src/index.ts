@@ -6,6 +6,7 @@ import {sync as syncMarketprice} from './tasks/marketprice/sync'
 import {sync as syncStaked} from './tasks/rex/sync'
 import {get as getMarkerprice} from './tasks/marketprice/get'
 import {initialize} from './influx'
+import {doWork} from './firehose'
 
 const scheduler = new ToadScheduler()
 
@@ -60,9 +61,9 @@ async function main() {
     await initialize()
 
     logger.info('Starting task scheduler')
-    startDbSize()
-    startMarketprice()
-    startREX()
+    // startDbSize()
+    // startMarketprice()
+    // startREX()
 
     const port = Bun.env.UNICOVE_HTTP_PORT || 3000
     logger.info('Starting HTTP service', {port})
@@ -92,6 +93,8 @@ async function main() {
             return new Response('Page not found', {status: 404})
         },
     })
+
+    doWork()
 }
 
 function ensureExit(code: number, timeout = 3000) {
