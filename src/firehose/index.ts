@@ -5,7 +5,7 @@ import {sf as firehose} from '../compiled_proto/src/proto/firehose'
 import {sf as antelope} from '../compiled_proto/src/proto/antelope'
 import {ChannelCredentials} from '@grpc/grpc-js'
 
-let lastCompletedBlock = 1
+let lastCompletedBlock = 392895900
 
 const cpu = influxdb.getWriteApi(INFLUX_ORG, 'cpu', 'ms')
 
@@ -199,30 +199,45 @@ export async function doWork() {
     }
     const client = new firehose.firehose.v2.StreamClient(
         Bun.env.UNICOVE_FIREHOSE_URL,
-        // ChannelCredentials.createSsl(),
-        ChannelCredentials.createInsecure(),
+        ChannelCredentials.createSsl(),
+        // ChannelCredentials.createInsecure(),
         {
             'grpc.max_receive_message_length': -1,
         }
     )
-    const request = new firehose.firehose.v2.Request({
-        start_block_num: lastCompletedBlock + 1,
+    const nextBlock = lastCompletedBlock + 1
+    console.log({
+        start_block_num: nextBlock,
+        stop_block_num: String(nextBlock + 100),
     })
-
-    // const channel = createChannel(
-    //     Bun.env.UNICOVE_FIREHOSE_URL,
-    //     ChannelCredentials.createInsecure(),
-    //     {
-    //         'grpc.max_receive_message_length': -1,
-    //     }
-    // )
-    // const client: StreamClient = createClient(StreamDefinition, channel)
+    const request = new firehose.firehose.v2.Request({
+        start_block_num: nextBlock,
+        stop_block_num: String(nextBlock + 100),
+    })
     try {
-        // console.log('doWork', options)
-        for await (const response of client.Blocks(request)) {
-            // console.log('response', response)
+        const stream = client.Blocks(request)
+        stream.on('data', (response) => {
             process(response)
-        }
+        })
+        stream.on('close', () => {
+            console.log('close')
+            doWork()
+        })
+        stream.on('status', (status) => {
+            console.log('status', status)
+        })
+        stream.on('end', () => {
+            console.log('end')
+            client.close()
+        })
+        stream.on('error', (error) => {
+            console.log('error', error)
+            // client.close()
+            // doWork()
+        })
+        // for await (const response of client.Blocks(request)) {
+        //     process(response)
+        // }
     } catch (e: unknown) {
         console.log('error', e)
         client.close()
