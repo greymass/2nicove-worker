@@ -5,6 +5,7 @@ import {sync as syncDbSize} from './tasks/dbsize/sync'
 import {sync as syncMarketprice} from './tasks/marketprice/sync'
 import {sync as syncStaked} from './tasks/rex/sync'
 import {get as getMarkerprice} from './tasks/marketprice/get'
+import {get as getREX } from './tasks/rex/get'
 import {initialize} from './influx'
 
 const scheduler = new ToadScheduler()
@@ -84,6 +85,35 @@ async function main() {
                 const data = await getMarkerprice('ram')
                 res = Response.json(data)
             }
+            if (path === '/api/rex/total_lent') {
+                const data = await getREX('total_lent')
+                res = Response.json(data)
+            }
+            if (path === '/api/rex/total_unlent') {
+                const data = await getREX('total_unlent')
+                res = Response.json(data)
+            }
+            if (path === '/api/rex/total_rent') {
+                const data = await getREX('total_rent')
+                res = Response.json(data)
+            }
+            if (path === '/api/rex/total_lendable') {
+                const data = await getREX('total_lendable')
+                res = Response.json(data)
+            }
+            if (path === '/api/rex/total_rex') {
+                const data = await getREX('total_rex')
+                res = Response.json(data)
+            }
+            if (path === '/api/rex/namebid_proceeds') {
+                const data = await getREX('namebid_proceeds')
+                res = Response.json(data)
+            }
+            if (path === '/api/rex/loan_num') {
+                const data = await getREX('loan_num')
+                res = Response.json(data)
+            }
+
             if (res) {
                 res.headers.set('Access-Control-Allow-Origin', '*')
                 res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
