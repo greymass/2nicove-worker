@@ -1,4 +1,4 @@
-export interface Marketprice {
+export interface InfluxData {
     result: string
     table: number
     _start: string
