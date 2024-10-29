@@ -2,7 +2,7 @@ import {logger} from '../../logger'
 import {INFLUX_ORG, influxdb} from '../../influx'
 import {Marketprice} from './types'
 
-export async function get(measurement: 'cpu' | 'net' | 'ram', bucket = '15m', range = '30d') {
+export async function get(measurement: 'cpu' | 'net' | 'ram', bucket = '1h', range = '30d') {
     const marketprice = influxdb.getQueryApi(INFLUX_ORG)
 
     const query = `
